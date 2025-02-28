@@ -2,17 +2,10 @@
 
 namespace CarOwnerManagement.Data
 {
-    public record RequestUpdateCar
-    {
-        public int Id { get; set; }
-
-        public string Name { get; set; } = string.Empty;
-
-        public string? Description { get; set; }
-
-        [EnumDataType(typeof(FuelType))]
-        public FuelType? FuelType { get; set; }
-
-        public ICollection<int> OwnersIds { get; set; } = [];
-    }
+    public record RequestUpdateCar(
+        int Id,
+        string Name, 
+        string? Description,
+        [EnumDataType(typeof(FuelType))] FuelType? FuelType,
+        ICollection<int> OwnersIds);
 }

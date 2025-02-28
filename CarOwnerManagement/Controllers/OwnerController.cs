@@ -11,15 +11,12 @@ namespace CarOwnerManagement.Controllers
         private readonly CarManagementDbContext _dbContext = dbContext;
 
         [HttpGet("get")]
+        [Produces("application/json")]
+        [ProducesResponseType<List<ResponseOwner>>(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetOwnersAsync()
         {
             var owners = await _dbContext.Owners
-                .Include(nameof(dbContext.Cars))
-                .Select(o => new ResponseOwner
-                {
-                    Name = o.Name,
-                    CarCount = o.Cars.Count
-                })
+                .Select(o => new ResponseOwner(o.Name, o.Cars.Count))
                 .ToListAsync();
 
             return Ok(owners);

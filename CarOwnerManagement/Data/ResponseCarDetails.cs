@@ -5,13 +5,13 @@ namespace CarOwnerManagement.Data
 {
     public class ResponseCarDetails
     {
-        public string Name { get; set; } = string.Empty;
-        
-        public string? Description { get; set; }
+        public string Name { get; init; }
 
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public FuelType? FuelType { get; set; }
+        public string? Description { get; init; }
         
-        public ICollection<string> OwnerNames { get; set; } = [];
+        [JsonConverter(typeof(JsonStringEnumConverter))] 
+        public FuelType? FuelType { get; init; }
+        
+        public ICollection<string> OwnerNames { get; init; }
     }
 }

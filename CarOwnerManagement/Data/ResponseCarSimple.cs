@@ -1,9 +1,4 @@
 ﻿namespace CarOwnerManagement.Data
 {
-    public record ResponseCarSimple
-    {
-        public string Name { get; set; } = string.Empty;
-
-        public string? Description { get; set; }
-    }
+    public record ResponseCarSimple(string Name, string? Description);
 }

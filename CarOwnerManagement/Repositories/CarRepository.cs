@@ -41,11 +41,7 @@ namespace CarOwnerManagement.Repositories
             }
 
             var sqlQuery = _dbContext.Cars
-                 .Select(c => new ResponseCarSimple
-                 {
-                     Name = c.Name,
-                     Description = c.Description,
-                 });
+                 .Select(c => new ResponseCarSimple(c.Name, c.Description));
 
             if (!string.IsNullOrEmpty(query))
             {
@@ -68,11 +64,12 @@ namespace CarOwnerManagement.Repositories
                     Name = c.Name,
                     Description = c.Description,
                     FuelType = c.FuelType,
-                    OwnerNames = c.Owners.Select(o => o.Name).ToList(),
-                }).FirstOrDefaultAsync(token);
+                    OwnerNames = c.Owners.Select(o => o.Name).ToList()
+                })
+                .FirstOrDefaultAsync(token);
         }
 
-        public async Task UpdateCarAsync(RequestUpdateCar car, CancellationToken token)
+        public async Task<int> UpdateCarAsync(RequestUpdateCar car, CancellationToken token)
         {
             if (car.OwnersIds == null)
             {
@@ -92,12 +89,12 @@ namespace CarOwnerManagement.Repositories
             carToUpdate.FuelType = car.FuelType;
             carToUpdate.Owners = owners;
 
-            await _dbContext.SaveChangesAsync(token);
+            return await _dbContext.SaveChangesAsync(token);
         }
 
-        public async Task DeleteCarAsync(int id, CancellationToken token)
+        public async Task<int> DeleteCarAsync(int id, CancellationToken token)
         {
-            var car = await _dbContext.Cars
+            return await _dbContext.Cars
                 .Where(c => c.Id == id)
                 .ExecuteDeleteAsync(token); // Cannot be tested with InMemoryDatabase
         }

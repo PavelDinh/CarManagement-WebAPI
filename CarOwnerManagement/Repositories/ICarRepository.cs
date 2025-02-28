@@ -11,8 +11,8 @@ namespace CarOwnerManagement.Repositories
 
         Task<ResponseCarDetails?> GetCarDetailsAsync(int id, CancellationToken token);
 
-        Task UpdateCarAsync(RequestUpdateCar car, CancellationToken token);
+        Task<int> UpdateCarAsync(RequestUpdateCar car, CancellationToken token);
 
-        Task DeleteCarAsync(int id, CancellationToken token);
+        Task<int> DeleteCarAsync(int id, CancellationToken token);
     }
 }

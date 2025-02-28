@@ -17,7 +17,10 @@ public class CarController(ILogger<CarController> logger, ICarRepository carRepo
     /// </summary>
     /// <param name="car"></param>
     /// <returns></returns>
+    
     [HttpPost("create")]
+    [Produces("application/json")]
+    [ProducesResponseType<ResponseCreatedCar>(StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateCar([FromBody] RequestAddCar car, CancellationToken token)
     {
         if (string.IsNullOrEmpty(car.Name))
@@ -28,7 +31,19 @@ public class CarController(ILogger<CarController> logger, ICarRepository carRepo
         try
         {
             var createdCar = await _carRepo.CreateCarAsync(car, token);
-            return CreatedAtAction(nameof(GetCarDetails), new { id = createdCar.Id }, createdCar);
+            if (createdCar != null)
+            {
+                var response = new ResponseCreatedCar(
+                    createdCar.Id,
+                    createdCar.Name,
+                    createdCar.Description,
+                    createdCar.FuelType,
+                    [.. createdCar.Owners.Select(o => o.Id)]);
+
+                return CreatedAtAction(nameof(GetCarDetails), new { id = response.Id }, response);
+            }
+
+            return BadRequest("Failed to create car");
         }
         catch (DbUpdateException ex)
         {
@@ -62,8 +77,8 @@ public class CarController(ILogger<CarController> logger, ICarRepository carRepo
     {
         try
         {
-            await _carRepo.UpdateCarAsync(car, token);
-            return Ok();
+            var recordsAffected = await _carRepo.UpdateCarAsync(car, token);
+            return Ok($"Records affected: {recordsAffected}");
         }
         catch (DbUpdateException ex)
         {
@@ -82,8 +97,8 @@ public class CarController(ILogger<CarController> logger, ICarRepository carRepo
     {
         try
         {
-            await _carRepo.DeleteCarAsync(id, token);
-            return Ok();
+            var recordsAffected = await _carRepo.DeleteCarAsync(id, token);
+            return Ok($"Records affected: {recordsAffected}");
         }
         catch (DbUpdateException ex)
         {
@@ -100,6 +115,8 @@ public class CarController(ILogger<CarController> logger, ICarRepository carRepo
     /// <param name="pageSize">d</param>
     /// <returns></returns>
     [HttpGet("get-paginated")]
+    [Produces("application/json")]
+    [ProducesResponseType<List<ResponseCreatedCar>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCars([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, CancellationToken token = default)
     {
         if (page < 1 || pageSize < 1)
@@ -131,6 +148,8 @@ public class CarController(ILogger<CarController> logger, ICarRepository carRepo
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpGet("get-details")]
+    [Produces("application/json")]
+    [ProducesResponseType<ResponseCarDetails>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCarDetails(int id, CancellationToken token)
     {
         try

@@ -42,13 +42,7 @@ namespace CarOwnerManagement.Tests
             SeedDatabase(dbContext);
             var repository = new CarRepository(dbContext);
 
-            var request = new RequestAddCar
-            {
-                Name = "NewCar",
-                Description = "NewCarDescription",
-                FuelType = FuelType.Gasoline,
-                OwnersIds = [1]
-            };
+            var request = new RequestAddCar("NewCar", "NewCarDescription", FuelType.Gasoline, [1]);
 
             // Act
             var result = await repository.CreateCarAsync(request, CancellationToken.None);
@@ -107,14 +101,7 @@ namespace CarOwnerManagement.Tests
             SeedDatabase(dbContext);
             var repository = new CarRepository(dbContext);
 
-            var request = new RequestUpdateCar
-            {
-                Id = 1,
-                Name = "UpdatedCar",
-                Description = "UpdatedDescription",
-                FuelType = FuelType.Diesel,
-                OwnersIds = [1]
-            };
+            var request = new RequestUpdateCar(1, "UpdatedCar", "UpdatedDescription", FuelType.Diesel, [1]);
 
             // Act
             await repository.UpdateCarAsync(request, CancellationToken.None);

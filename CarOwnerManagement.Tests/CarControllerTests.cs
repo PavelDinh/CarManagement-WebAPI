@@ -24,7 +24,7 @@ public class CarControllerTests
     public async Task CreateCar_ReturnsBadRequest_WhenCarNameIsNull()
     {
         // Arrange
-        var car = new RequestAddCar { Name = null };
+        var car = new RequestAddCar(string.Empty, null, null, []);
 
         // Act
         var result = await _controller.CreateCar(car, CancellationToken.None);
@@ -38,9 +38,10 @@ public class CarControllerTests
     public async Task CreateCar_ReturnsCreatedAtAction_WhenCarIsCreated()
     {
         // Arrange
-        var car = new RequestAddCar { Name = "Test Car" };
-        var createdCar = new Car { Id = 1, Name = "Test Car" };
-        _carRepoMock.Setup(repo => repo.CreateCarAsync(car, It.IsAny<CancellationToken>())).ReturnsAsync(createdCar);
+        var car = new RequestAddCar("Test Car", null, null, []);
+        var createdCar = new ResponseCreatedCar(1, "Test Car", null, null, []);
+        var entityCar = new Car { Id = 1, Name = "Test Car" };
+        _carRepoMock.Setup(repo => repo.CreateCarAsync(car, It.IsAny<CancellationToken>())).ReturnsAsync(entityCar);
 
         // Act
         var result = await _controller.CreateCar(car, CancellationToken.None);
@@ -48,20 +49,20 @@ public class CarControllerTests
         // Assert
         var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(nameof(_controller.GetCarDetails), createdAtActionResult.ActionName);
-        Assert.Equal(createdCar, createdAtActionResult.Value);
+        Assert.Equivalent(createdCar, createdAtActionResult.Value);
     }
 
     [Fact]
     public async Task UpdateCar_ReturnsOk_WhenCarIsUpdated()
     {
         // Arrange
-        var car = new RequestUpdateCar { Id = 1, Name = "Updated Car" };
+        var car = new RequestUpdateCar(1, "UpdatedCar", null, null, []);
 
         // Act
         var result = await _controller.UpdateCar(car, CancellationToken.None);
 
         // Assert
-        Assert.IsType<OkResult>(result);
+        Assert.IsType<OkObjectResult>(result);
     }
 
     [Fact]
@@ -74,7 +75,7 @@ public class CarControllerTests
         var result = await _controller.DeleteCarById(carId, CancellationToken.None);
 
         // Assert
-        Assert.IsType<OkResult>(result);
+        Assert.IsType<OkObjectResult>(result);
     }
 
     [Fact]
@@ -92,7 +93,7 @@ public class CarControllerTests
     public async Task GetCars_ReturnsOk_WithPaginatedCars()
     {
         // Arrange
-        var cars = new List<ResponseCarSimple> { new() { Name = "Test Car" } };
+        var cars = new List<ResponseCarSimple> { new(Name: "Test Car", null) };
         _carRepoMock.Setup(repo => repo.GetCarsPaginatedAsync(null, 1, 10, It.IsAny<CancellationToken>())).ReturnsAsync(cars);
 
         // Act
